@@ -42,3 +42,7 @@
 #asunto {
 	height: 60px;
 }
+
+#fecha-div, #asunto-div {
+	margin-left: 8px;
+}
