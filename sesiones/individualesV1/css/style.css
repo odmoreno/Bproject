@@ -28,7 +28,7 @@
 	margin-bottom:10px;
 }
 
-#region-div, #partido-div{
+#region-div, #partido-div, #prov-div, #prog-div, #map-div {
 	width: 150px;
 	float:left;
 	margin-left:10px;
