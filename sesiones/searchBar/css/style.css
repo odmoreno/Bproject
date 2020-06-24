@@ -46,3 +46,8 @@
 #fecha-div, #asunto-div {
 	margin-left: 8px;
 }
+
+.list-group-item {
+	height: auto;
+	font-size: small;
+}

@@ -40,6 +40,10 @@ let sesionid = 0
 let validLinks = []
 //let validNodes = []
 
+//Elementos del buscador
+const searchBar = document.getElementById('search');
+const matchList = document.getElementById('match-list');
+
 let simulation = d3.forceSimulation(nodos)
     .force("charge", d3.forceManyBody().strength(-40))
     .force("link", d3.forceLink(links).id(d => d.id))
@@ -49,7 +53,12 @@ let simulation = d3.forceSimulation(nodos)
     .alpha(0.5)
     .on("tick", tick);
 
+simulation.force("link").links(validLinks);
+
 let nodes = g.selectAll("circle")
+
+simulation.nodes(nodos, d=> d.id)
+simulation.alpha(0.3).restart();
 
 const promises = [
     d3.json("data/info2.json"),
@@ -94,28 +103,28 @@ g.call(tip);
 
 $("#region-select")
     .on("change", function(){
-        console.log('Sesion actual:', sesionid)
+        //console.log('Sesion actual:', sesionid)
         resetFlags()
         update(sesiones[sesionid]);
     })
 
 $("#provincia-select")
     .on("change", function(){
-        console.log('Sesion actual:', sesionid)
+        //console.log('Sesion actual:', sesionid)
         resetFlags()
         update(sesiones[sesionid]);
     })
 
 $("#partido-select")
     .on("change", function(){
-        console.log('Sesion actual:', sesionid)
+        //console.log('Sesion actual:', sesionid)
         resetFlags()
         update(sesiones[sesionid]);
     })
 
 $("#map-select")
     .on("change", function(){
-        console.log('Sesion actual:', sesionid)
+        //console.log('Sesion actual:', sesionid)
         resetFlags()
         removeLegends()
         updateLegends()
@@ -130,13 +139,20 @@ $("#date-slider").ionRangeSlider({
     grid: true,         // default false (enable grid)
     onChange: function (data) {
         // fired on every range slider update
-        console.log('on change', data.from)
+        //console.log('on change', data.from)
+        searchBar.value = ''
+        matchList.innerHTML = ''
         sesionid = data.from
         resetFlags()
         update(sesiones[sesionid])
     }
 });
 
+$("#search")
+    .on("input", function() {
+        console.log('hello search', this.value)
+        searchSesiones(this.value)
+    })
 
 Promise.all(promises).then(allData => {
     let info = allData[0]
@@ -384,7 +400,7 @@ function update(data) {
       enter => 
         enter.append("circle").attr("r", 5)
             .call(enter => enter.transition().attr("r", 5).attr("fill", function(d) { 
-                console.log('color', color(d, mapeo))
+                //console.log('color', color(d, mapeo))
                 return color(d, mapeo) }).transition().duration(500)),
       update => update.transition().duration(500).attr("fill", d => color(d, mapeo)),
       exit => exit.remove().transition().duration(500)
@@ -423,7 +439,7 @@ function colorGroup(d){
 
 //function general para el mapeo de colores
 function color(d, option){
-    console.log("option", option)
+    //console.log("option", option)
     if(option == "partidos"){
         let valueId = partidos[d.partido.trim()]
         return colorPartidos(valueId)
@@ -482,3 +498,60 @@ function validateLinks(validNodes, linksSesion){
     console.log('valid links', links)
     return links
 }
+
+
+function searchSesiones (searchText){
+    console.log('Sesiones search', sesiones)
+    let ses = Object.values(sesiones)
+    let matches = ses.filter(sess => {
+        const regex =  new RegExp(`^${searchText}`, 'gi')
+        const regex2 =  new RegExp(`\\b.*${searchText}.*?\\b`, 'gi')
+        let sesionN = sess.sesion.toString();
+        return sesionN.match(regex) || sess.asunto.match(regex2)
+      }); 
+    if (searchText.length === 0 ){
+      matches = []
+      matchList.innerHTML = '';
+    }
+    console.log(matches)
+    outputSesiones(matches)
+}
+
+function outputSesiones (matches){
+    if (matches.length > 0){
+        const html = matches.map(match => 
+          `
+          <a href="#"  id=${match.sesId}
+          class="list-group-item list-group-item-action mb-1" data-toggle="list" role="tab" onclick="getId(this.id)">
+            <p>${match.asunto.substr(0, 100)} 
+              ... <span class="text-primary"> ${match.name}</span>
+              <small> -- ${match.fecha} - ${match.hora}</small>
+            </p>
+            </a>
+          `).
+          join('');
+          //console.log(html)
+          matchList.innerHTML = html 
+      }
+      else matchList.innerHTML = '';
+}
+
+function getId (id){
+    sesionid = id
+    let sesion = sesiones[sesionid]
+    console.log("id", id)
+    console.log("sesion: ", sesion)
+    searchBar.value = sesion.name
+    matchList.innerHTML = '';
+    update(sesion)
+
+
+    let slider = $("#date-slider").data("ionRangeSlider");
+
+    // Change slider, by calling it's update method
+    slider.update({
+        from: id,
+    });
+
+} 
+

@@ -3,6 +3,26 @@
 *    Ejemplo de autocompletar con Jquery
 */
 
+//const res = await fetch('data/nodos.json')
+//const pers = await res.json()
+//const asamb = Object.values(pers)
+
+//let dict = {
+//  "36": {"id": "collaguazo pilco rodrigo", "data": ["sesion 240", "sesion 241","sesion 242"]},
+//  "50": {"id": "diaz velasco laura yesenia" , "data": ["sesion 340", "sesion 341","sesion 342"] },
+//}
+//
+//let invDict = {}
+//
+//for (let key in dict) {
+//    data = dict[key]
+//    invDict[data.id] = key
+//}
+//
+//let dictarry = Object.values(dict)
+//
+//console.log(dictarry)
+
 let source = [
     {"id": 1, "name": "red"},
     {"id": 2, "name": "green"},

@@ -28,19 +28,35 @@
     <!-- Bootstrap grid setup -->
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div id="slider-div">
                     <label>Sesion: <span id="sesion">0</span> </label>
                     <label>Votacion: <span id="votacion">0</span></label>
-                    
                     <div id="date-slider"></div>
                     <br/>
-                    <div class="row" id="asunto-div">
-                        <label> Asunto: <span id="asunto"></span></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6 m-auto">
+                        <h3 class="text-left">Buscar : </h3>
+                        <div class="form-group">
+                            <input type="text" id="search" class="form-control form-control-sm" placeholder="Buscar asunto o sesion ..."/>
+                        </div>
                     </div>
-                    <div class="row" id="fecha-div">
-                        <label>Fecha: <span id="fecha">0</span> </label>
-                    </div>
+                </div>
+                <div class="row">
+                    <div class="list-group col-md-6 " id="match-list" role="tablist" multiple></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row" id="asunto-div">
+                    <label> Asunto: <span id="asunto"></span></label>
+                </div>
+                <div class="row" id="fecha-div">
+                    <label>Fecha: <span id="fecha">0</span> </label>
                 </div>
             </div>
         </div>
