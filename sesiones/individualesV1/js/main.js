@@ -40,9 +40,19 @@ let sesionid = 0
 let validLinks = []
 //let validNodes = []
 
+let codeVotes = {
+    "0": "abstencion",
+    "1": "ausente",
+    "2": "si",
+    "3": "no",
+    "4": "blanco" 
+}
+let votesSet = [0,1,2,3,4]
+
 //Elementos del buscador
 const searchBar = document.getElementById('search');
 const matchList = document.getElementById('match-list');
+const fechaList = document.getElementById('fecha-list');
 
 let simulation = d3.forceSimulation(nodos)
     .force("charge", d3.forceManyBody().strength(-40))
@@ -50,18 +60,16 @@ let simulation = d3.forceSimulation(nodos)
     //.force("center", d3.forceCenter(width / 2, height / 2))
     .force("x", d3.forceX())
     .force("y", d3.forceY())
-    .alpha(0.5)
     .on("tick", tick);
 
-simulation.force("link").links(validLinks);
+simulation.alpha(0.3).restart();
+//simulation.force("link").links(validLinks);
 
 let nodes = g.selectAll("circle")
 
-simulation.nodes(nodos, d=> d.id)
-simulation.alpha(0.3).restart();
 
 const promises = [
-    d3.json("data/info2.json"),
+    d3.json("data/info.json"),
     d3.json("data/nodos.json"),
     d3.json("data/links.json"),
     d3.json("data/data.json"),
@@ -80,7 +88,7 @@ let formatDate = d3.timeFormat("%e-%b-%Y")
 let legend = d3.select("svg")
     .append("g")
     .attr("id", "g2")
-    .attr("transform", "translate(" + (400) + 
+    .attr("transform", "translate(" + (320) + 
             "," + (-200) + ")");
     //.attr("transform", "translate(" + (width - 50) + 
     //    "," + (height - 400) + ")");
@@ -96,15 +104,18 @@ var tip = d3.tip().attr('class', 'd3-tip')
         text += "<strong>Partido:</strong> <span style='color:red;text-transform:capitalize'>" + d.partido + "</span><br>";
         text += "<strong>Provincia:</strong> <span style='color:red;text-transform:capitalize'>" + d.provincia + "</span><br>";
         text += "<strong>Region:</strong> <span style='color:red;text-transform:capitalize'>" + d.region + "</span><br>";
+        text += "<strong>Voto:</strong> <span style='color:red;text-transform:capitalize'>" + codeVotes[d.voto]  + "</span><br>";
         text += "<strong>Suplente:</strong> <span style='color:red;text-transform:capitalize'>" + value  + "</span><br>";
         return text;
     });
 g.call(tip);
 
+
 $("#region-select")
     .on("change", function(){
         //console.log('Sesion actual:', sesionid)
         resetFlags()
+        resetOpacity()
         update(sesiones[sesionid]);
     })
 
@@ -112,6 +123,7 @@ $("#provincia-select")
     .on("change", function(){
         //console.log('Sesion actual:', sesionid)
         resetFlags()
+        resetOpacity()
         update(sesiones[sesionid]);
     })
 
@@ -119,6 +131,7 @@ $("#partido-select")
     .on("change", function(){
         //console.log('Sesion actual:', sesionid)
         resetFlags()
+        resetOpacity()
         update(sesiones[sesionid]);
     })
 
@@ -140,8 +153,9 @@ $("#date-slider").ionRangeSlider({
     onChange: function (data) {
         // fired on every range slider update
         //console.log('on change', data.from)
-        searchBar.value = ''
-        matchList.innerHTML = ''
+        //searchBar.value = ''
+        //matchList.innerHTML = ''
+        fechaList.innerHTML = '';
         sesionid = data.from
         resetFlags()
         update(sesiones[sesionid])
@@ -151,8 +165,43 @@ $("#date-slider").ionRangeSlider({
 $("#search")
     .on("input", function() {
         console.log('hello search', this.value)
+        resetFlags()
         searchSesiones(this.value)
     })
+    .on("click", function(){
+        console.log('hello click', this.value)
+        resetFlags()
+        searchSesiones(this.value)
+    })
+    
+$("#match-list")
+    .on("focusout", function(){
+        console.log('Afuera')
+        //matchList.innerHTML = '';
+    })
+
+$("#datepicker").datepicker( {
+    format: "mm-yyyy",
+    startView: "months", 
+    minViewMode: "months",
+    maxViewMode: 2,
+    orientation: "bottom auto",
+    startDate: "05-2017",
+    endDate: "11-2018",
+    clearBtn: true,
+    autoclose: true
+}).on('changeDate', function(e) {
+    //console.log('changeDate:', e.date)
+    resetFlags()
+    let date = e.date
+    console.log("month:", date.getMonth() + 1)
+    //console.log("year:", date.getFullYear())
+    searchFechas(date)
+}).on('clearDate', function(e) {
+    console.log('year:', e.date)
+    fechaList.innerHTML = '';
+});
+
 
 Promise.all(promises).then(allData => {
     let info = allData[0]
@@ -179,6 +228,7 @@ function manageData(){
     console.log('enlaces', Object.keys(enlaces).length)
     console.log('sesiones', sesiones)
 
+    //console.log('Fechas', Object.values(sesiones).filter)
 
     //updateLegends()
     
@@ -188,12 +238,20 @@ function manageData(){
     update(sesiones[0])    
 }
 
+
 function resetFlags(){
     for (let key in asambleistas) {
         if(asambleistas[key].visitado == true) asambleistas[key].visitado = false
     }
     for (let key in enlaces) {
         if(enlaces[key].visitado == 1) enlaces[key].visitado = 0
+    }
+
+}
+
+function resetOpacity(){
+    for (let key in asambleistas) {
+        if(asambleistas[key].opacidad == 0.3) asambleistas[key].opacidad = 1
     }
 }
 
@@ -234,9 +292,9 @@ function updateLegends() {
                 .attr("fill", colorPartidos(valueid));
         
             legendRow.append("text")
-                .attr("x", -10)
+                .attr("x", 20)
                 .attr("y", 10)
-                .attr("text-anchor", "end")
+                .attr("text-anchor", "start")
                 .style("text-transform", "capitalize")
                 .text(element);
         });
@@ -254,9 +312,9 @@ function updateLegends() {
                 .attr("fill", colorRegions(valueid));
         
             legendRow.append("text")
-                .attr("x", -10)
+                .attr("x", 30)
                 .attr("y", 10)
-                .attr("text-anchor", "end")
+                .attr("text-anchor", "start")
                 .style("text-transform", "capitalize")
                 .text(element);
         });
@@ -274,11 +332,31 @@ function updateLegends() {
                 .attr("fill", colorProvincias(valueid));
         
             legendRow.append("text")
-                .attr("x", -10)
+                .attr("x", 30)
                 .attr("y", 10)
-                .attr("text-anchor", "end")
+                .attr("text-anchor", "start")
                 .style("text-transform", "capitalize")
                 .text(element);
+        });
+    }
+    else if (option == "voto") {
+        list = votesSet
+        list.forEach(function(element, i){
+            let valueid = element
+            var legendRow = legend.append("g")
+            .attr("transform", "translate(0, " + (i * 20) + ")");
+        
+            legendRow.append("rect")
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("fill", colorVotos(valueid));
+        
+            legendRow.append("text")
+                .attr("x", 30)
+                .attr("y", 10)
+                .attr("text-anchor", "start")
+                .style("text-transform", "capitalize")
+                .text(codeVotes[element]);
         });
     }
 }
@@ -310,6 +388,98 @@ function selectLegends(list, dict){
     });
 }
 
+function searchFechas (searchDate){
+    let searchMonth = searchDate.getMonth() + 1
+    let searchYear = searchDate.getFullYear()
+     console.log("month:", searchMonth)
+    console.log("year:", searchYear)
+
+    let ses = Object.values(sesiones)
+    let matches = ses.filter(sess => {
+        let fechaSes = parseDate(sess.fecha)
+        let mes = fechaSes.getMonth() + 1
+        let year = fechaSes.getFullYear()
+        //console.log("parse", fechaSes)
+        //console.log("mes", fechaSes.getMonth() + 1)
+        //console.log("year:", fechaSes.getFullYear())
+        return searchYear === year && searchMonth === mes
+      }); 
+    console.log(matches)
+    outputFechas(matches)
+}
+function outputFechas(matches){
+    if (matches.length > 0){
+        const html = matches.map(match => 
+          `
+          <a href="#"  id=${match.sesId}
+          class="list-group-item list-group-item-action mb-1" data-toggle="list" role="tab" onclick="getId(this.id)">
+            <p>${match.asunto.substr(0, 100)} 
+              ... <span class="text-primary"> ${match.name}</span>
+              <small> -- ${match.fecha} - ${match.hora}</small>
+            </p>
+            </a>
+          `).
+          join('');
+          //console.log(html)
+          fechaList.innerHTML = html 
+      }
+      else fechaList.innerHTML = '';
+}
+
+function searchSesiones (searchText){
+    console.log('Sesiones search', sesiones)
+    let ses = Object.values(sesiones)
+    let matches = ses.filter(sess => {
+        const regex =  new RegExp(`^${searchText}`, 'gi')
+        const regex2 =  new RegExp(`\\b.*${searchText}.*?\\b`, 'gi')
+        let sesionN = sess.sesion.toString();
+        return sesionN.match(regex) || sess.asunto.match(regex2)
+      }); 
+    if (searchText.length === 0 ){
+      matches = []
+      //matchList.innerHTML = '';
+      fechaList.innerHTML = ''
+    }
+    console.log(matches)
+    outputSesiones(matches)
+}
+
+function outputSesiones (matches){
+    if (matches.length > 0){
+        const html = matches.map(match => 
+          `
+          <a href="#"  id=${match.sesId}
+          class="list-group-item list-group-item-action mb-1" data-toggle="list" role="tab" onclick="getId(this.id)">
+            <p>${match.asunto.substr(0, 100)} 
+              ... <span class="text-primary"> ${match.name}</span>
+              <small> -- ${match.fecha} - ${match.hora}</small>
+            </p>
+            </a>
+          `).
+          join('');
+          //console.log(html)
+         // matchList.innerHTML = html 
+         fechaList.innerHTML = html
+      }
+      else fechaList.innerHTML = '';
+}
+
+function getId (id){
+    sesionid = id
+    let sesion = sesiones[sesionid]
+    console.log("id", id)
+    console.log("sesion: ", sesion)
+    //searchBar.value = sesion.name
+    //matchList.innerHTML = '';
+    fechaList.innerHTML = ''
+    update(sesion)
+    //simulation.on("tick", tick);
+    let slider = $("#date-slider").data("ionRangeSlider");
+    // Change slider, by calling it's update method
+    slider.update({
+        from: id,
+    });
+} 
 
 function update(data) {
 
@@ -330,11 +500,16 @@ function update(data) {
     console.log('mapeo select: ', mapeo)
 
     console.log('sesion', data)
-    let nodosSesion =  data.nodes
+    let nodosSesion =  data.nodes // pasa los nodos de las sesion y sus votos
     let linksSesion =  data.links
 
+    let parse = parseDate(data.fecha)
+    console.log("parse", parse)
+    console.log("mes", parse.getMonth() + 1)
+    console.log("month:", d3.timeMonth(parse))
     let fecha = formatDate(parseDate(data.fecha))
-    //console.log(fecha)
+    console.log(fecha)
+    
     
     //var d = {created_time : "2018-01-15T12:37:30+0000"}
     //var parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%S%Z")
@@ -342,9 +517,11 @@ function update(data) {
     //console.log(formatDate(parseDate(d.created_time)))
 
     for (let i=0; i<nodosSesion.length; i++){
-        id = nodosSesion[i]
-        if(asambleistas[id]){
-            asambleistas[id].visitado = true
+        let _asamb = nodosSesion[i]
+        //console.log("info asamb", _asamb)
+        if(asambleistas[_asamb.id]){
+            asambleistas[_asamb.id].visitado = true
+            asambleistas[_asamb.id].voto = _asamb.voto
         }
         else console.log('No existe', id)
     }
@@ -372,34 +549,46 @@ function update(data) {
     console.log('nodos asam', newnodes)
     console.log('links asam', newlinks)
 
-    let validNodes =  newnodes.filter(function(d){
-        if (region == "all" && partidoTag =="all" && provTag =="all" ) { return true; }
+    for (let i=0; i<newnodes.length; i++){
+        let d = newnodes[i]
+        if (region == "all" && partidoTag =="all" && provTag =="all" ) { newnodes[i].opacidad = 1 }
         else if (region != "all" && partidoTag !="all" && provTag !="all") { 
-            return d.region == region && d.partido.trim() == partidoTag && d.provincia.trim() == provTag 
+            console.log('Partido region y prov')
+            if (d.partido == partidoTag && d.region == region && d.provincia == provTag) newnodes[i].opacidad = 1 
+            else newnodes[i].opacidad = 0.2
         } 
         else if (region != "all" && provTag !="all") {
-            return (d.region == region && d.provincia.trim() == provTag) || d.partido.trim() == partidoTag
+            console.log('Region y provincia')
+            if (d.region == region && d.provincia == provTag) newnodes[i].opacidad = 1 
+            else newnodes[i].opacidad = 0.2
         }
         else if (region != "all" && partidoTag !="all") {
-            return (d.region == region && d.partido.trim() == partidoTag) || d.provincia.trim() == provTag
+            console.log('Partido y region')
+            if (d.partido == partidoTag && d.region == region) newnodes[i].opacidad = 1 
+            else newnodes[i].opacidad = 0.2
         }
         else if (provTag !="all" && partidoTag !="all") {
-            return (d.provincia.trim() == provTag && d.partido.trim() == partidoTag) || d.region == region
+            console.log('Partido y provincia')
+            if (d.partido == partidoTag && d.provincia == provTag) newnodes[i].opacidad = 1 
+            else newnodes[i].opacidad = 0.2
         }
         else {
-            return d.region == region || d.partido.trim() == partidoTag || d.provincia.trim() == provTag
+            console.log('last case else')
+            if (d.partido != partidoTag && d.region != region && d.provincia != provTag) {newnodes[i].opacidad = 0.2 }
+            else newnodes[i].opacidad = 1
         }
-    })
-    console.log('valid nodes', validNodes)
+    }
 
-    validLinks = validateLinks(validNodes, newlinks)
+    let validNodes = [...newnodes]
+    let validLinks = [...newlinks]
+    //validLinks = validateLinks(validNodes, newlinks)
 
     nodes = nodes
     .data(validNodes, d => d.id)
     .join(
       enter => 
-        enter.append("circle").attr("r", 5)
-            .call(enter => enter.transition().attr("r", 5).attr("fill", function(d) { 
+        enter.append("circle").attr("r", 7)
+            .call(enter => enter.transition().attr("r", 7).attr("fill", function(d) { 
                 //console.log('color', color(d, mapeo))
                 return color(d, mapeo) }).transition().duration(500)),
       update => update.transition().duration(500).attr("fill", d => color(d, mapeo)),
@@ -408,10 +597,12 @@ function update(data) {
 
     //nodes.append("title")
     //  .text(d => d.nombre);
-
     nodes
         .on("mouseover", tip.show)
         .on("mouseout", tip.hide)
+    
+    nodes
+        .style('opacity', d=> d.opacidad)
 
     simulation.nodes(validNodes, d=> d.id)
     simulation.force("link").links(validLinks);
@@ -452,12 +643,19 @@ function color(d, option){
         let valueId = provincias[d.provincia.trim()]
         return colorProvincias(valueId)
     }
+    else if (option == "voto") {
+        let valueId = d.voto
+        return colorVotos(valueId)
+    }
 }
 
 function colorPartidos(d){
     let partidosD = [...new Set(partidosId)]
-    let scale = d3.scaleSequential().domain([1, partidosD.length-1]).interpolator(d3.interpolateRainbow);
+    const colors = ["#1b70fc", "#158940", "#d50527", "#faff16", "#f898fd", "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a"]
+    let scale = d3.scaleOrdinal().domain(partidosD).range(colors);
     return scale(d)
+    //let scale = d3.scaleSequential().domain([1, partidosD.length-1]).interpolator(d3.interpolateRainbow);
+    //return scale(d)
 }
 
 function colorRegions(d) {
@@ -471,6 +669,11 @@ function colorProvincias(d){
     let prov = [...new Set(provId)]
     //let valueId = provincias[d.trim()]
     let scale = d3.scaleSequential().domain([0, prov.length-1]).interpolator(d3.interpolateRainbow);
+    return scale(d)
+}
+
+function colorVotos(d){
+    let scale = d3.scaleOrdinal().domain(votesSet).range(d3.schemeCategory10);
     return scale(d)
 }
 
@@ -500,58 +703,5 @@ function validateLinks(validNodes, linksSesion){
 }
 
 
-function searchSesiones (searchText){
-    console.log('Sesiones search', sesiones)
-    let ses = Object.values(sesiones)
-    let matches = ses.filter(sess => {
-        const regex =  new RegExp(`^${searchText}`, 'gi')
-        const regex2 =  new RegExp(`\\b.*${searchText}.*?\\b`, 'gi')
-        let sesionN = sess.sesion.toString();
-        return sesionN.match(regex) || sess.asunto.match(regex2)
-      }); 
-    if (searchText.length === 0 ){
-      matches = []
-      matchList.innerHTML = '';
-    }
-    console.log(matches)
-    outputSesiones(matches)
-}
 
-function outputSesiones (matches){
-    if (matches.length > 0){
-        const html = matches.map(match => 
-          `
-          <a href="#"  id=${match.sesId}
-          class="list-group-item list-group-item-action mb-1" data-toggle="list" role="tab" onclick="getId(this.id)">
-            <p>${match.asunto.substr(0, 100)} 
-              ... <span class="text-primary"> ${match.name}</span>
-              <small> -- ${match.fecha} - ${match.hora}</small>
-            </p>
-            </a>
-          `).
-          join('');
-          //console.log(html)
-          matchList.innerHTML = html 
-      }
-      else matchList.innerHTML = '';
-}
-
-function getId (id){
-    sesionid = id
-    let sesion = sesiones[sesionid]
-    console.log("id", id)
-    console.log("sesion: ", sesion)
-    searchBar.value = sesion.name
-    matchList.innerHTML = '';
-    update(sesion)
-
-
-    let slider = $("#date-slider").data("ionRangeSlider");
-
-    // Change slider, by calling it's update method
-    slider.update({
-        from: id,
-    });
-
-} 
 

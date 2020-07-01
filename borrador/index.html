@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>Grafo de sesiones Individuales</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- jQuery UI CSS -->
+    <link rel="stylesheet" href="css/jquery-ui.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
+    <!-- D3 Tooltip CSS -->
+    <link rel="stylesheet" href="css/d3-tip.css">
+    <!-- Ion range slider -->
+    <link rel="stylesheet" href="css/ion.rangeSlider.min.css">
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid col-sm-12">
+            <a class="navbar-brand" href="#"><img id="logo" src="img/logo.png"></a>      
+        </div>
+    </nav>
+
+    <!-- Bootstrap grid setup -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="slider-div">
+                    <label>Sesion: <span id="sesion">0</span> </label>
+                    <label>Votacion: <span id="votacion">0</span></label>
+                    <div id="date-slider"></div>
+                    <br/>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row justify-content-md-center">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+                        <label class="form-check-label" for="inlineRadio1">Por asuntos</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                        <label class="form-check-label" for="inlineRadio2">Por asambleistas</label>
+                      </div>
+                </div>
+                <!-- <div class="row">
+                    <div class="col-md-6 m-auto">
+                            <h3 class="text-left">Buscar : </h3> 
+                        <div class="form-group">
+                            <input type="text" id="search" class="form-control form-control-sm" placeholder="Buscar asunto o sesion ..."/>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="row">
+                    <div class="col-md-6 m-auto">
+                            <h3 class="text-left">Buscar : </h3> 
+                        <div class="form-group">
+                            <input type="text" id="search-asamb" class="form-control form-control-sm" placeholder="Buscar asambleistas ..."/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="list-group col-md-6 " id="match-list" role="tablist" multiple></div>
+                </div>
+            </div>
+        </div>
+        <!--  <div class="row">
+            <div class="col-md-12" id="content-div">
+                <div class="row justify-content-center" id="asunto-div">
+                    <label class="text-center"> <span id="asunto-1"></span></label>
+                </div>
+                <div class="row justify-content-center" id="fecha-div">
+                    <label class="text-center"> <span id="fecha-1"> </span> </label>
+                </div>
+            </div>
+        </div>-->
+        <div class="row">
+            <div class="d-flex flex-column justify-content-center" id="content-div">
+                <div class="p-3" id="asunto-div">
+                    <label class="text-center"> <span id="asunto"></span></label>
+                </div>
+                <div class="p-3" id="fecha-div">
+                    <label class="text-secondary"> <span id="fecha"> </span> </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3 col-md-3">
+                <div class="col-3" id="partido-div">
+                    <label for="partido-select">Partidos: </label>
+                    
+                    <select id="partido-select" class="form-control">
+                        <option selected value="all">all</option>
+                    </select>
+                </div>
+                <div class="col-3" id="region-div">
+                    <label for="region-select">Región: </label>
+                    <select  id="region-select" class="form-control">
+                        <option selected value="all">all</option>
+                        <option value="costa">costa</option>
+                        <option value="sierra">sierra</option>
+                        <option value="oriente">oriente</option>
+                        <option value="insular">insular</option>
+                    </select>
+                </div>
+                <div class="col-3" id="prov-div">
+                    <label for="provincia-select">Provincias: </label>
+                    <select id="provincia-select" class="form-control">
+                        <option selected value="all">all</option>
+                    </select>
+                </div>
+                <br/>
+                <br/>
+                <br/>
+                <div class="col-3 progress" id="prog-div">
+                    <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <br/>
+                <br/>
+                <br/>
+                <div class="col-3" id="map-div">
+                    <label for="map-select">Mapeo: </label>
+                    <select  id="map-select" class="form-control">
+                        <option selected value="partidos">partidos</option>
+                        <option value="region">region</option>
+                        <option value="provincia">provincia</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-9 col-md-9">
+                <div id="chart-area"></div>    
+            </div>
+        </div>  
+    </div>
+    
+
+<!-- External JS libraries -->
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/d3.min.js"></script>
+<script src="js/d3-tip.js"></script>
+<script src="js/ion.rangeSlider.min.js"></script>
+<!-- Custom JS -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
