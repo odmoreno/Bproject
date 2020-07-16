@@ -28,7 +28,7 @@
 	margin-bottom:10px;
 }
 
-#region-div, #partido-div, #prov-div, #prog-div, #map-div {
+#region-div, #partido-div, #prov-div, #prog-div, #map-div, #info-div {
 	width: 150px;
 	float:none;
 	margin-left:10px;
@@ -77,6 +77,10 @@
 	margin-top: 23px;
 }
 
-#form1, #form2 {
+#form1, #form2 , #form3{
 	border: 1px solid lightblue;
+}
+
+.container-fluid{
+	max-width: 991.98px;
 }

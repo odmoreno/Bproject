@@ -1,0 +1,118 @@
+#chart-area svg {
+	margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+#logo {
+	height:50px;
+}
+
+.container-fluid{
+	width: 65%;
+}
+
+.navbar-brand {
+	height: 60px;
+	padding: 5px 0px;
+}
+
+#reset-button, #play-button, #slider-div {
+	float: left;
+	margin:5px;
+}
+
+#slider-div {
+	width:600px;
+	margin-left:10px;
+}
+
+#reset-button, #play-button {
+	margin-top: 5px;
+	margin-bottom:10px;
+}
+
+#region-div, #partido-div, #prov-div, #prog-div, #map-div, #info-div {
+	width: 150px;
+	float:none;
+	margin-left:10px;
+	margin-top:5px;
+}
+
+#g2 {
+	font-size: 14px;
+}
+
+#asunto {
+	height: 60px;
+	width: 100%;
+}
+
+#fecha-div, #asunto-div {
+	text-align: center;
+}
+
+#content-div {
+	width: 800px;
+	height: 80px;
+	margin: auto;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	/*border: 3px solid #73AD21;*/
+}
+
+#match-list {
+	max-height: 150px;
+	overflow: scroll; 
+	overflow-x: auto;
+  /*opacity: 0;*/
+	transition: visibility 0.2s, opacity 0.2s;
+}
+
+#fecha-list {
+	max-height: 200px;
+	max-width: 800px;
+	/*overflow: scroll; 
+	overflow-x: auto;*/
+  opacity: 0.9;
+	transition: visibility 0.2s, opacity 0.2s;
+}
+
+.list-group-item {
+	position: relative;
+	display: block;
+	padding: .75rem 1.25rem;
+	margin-bottom: -1px;
+	background-color:#efefef;
+	/*border: 1px solid rgba(0,0,0,.125);*/
+	border: 1px solid transparent;
+}
+
+.list-group-item-action {
+	width: 100%;
+	color: #495057;
+	height: 50px;
+	text-align: inherit;
+}
+
+
+#form1, #form2 , #form3{
+	/*border: 1px solid lightblue;*/
+}
+
+#btn-add, #example-button, #btn-add-map , .btn-outline-info{
+	justify-content: center;
+	margin-top: 30px;
+	margin-left: 20px
+}
+
+#filters-div, #mapeo-div {
+	/*border-bottom: 1px solid lightblue;*/
+	width: 250px;
+}
+
+#show-filters, #show-maps {
+	border: 1px solid lightblue;
+	width: 250px;
+}
+

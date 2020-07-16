@@ -126,12 +126,39 @@
                             <option value="voto">voto</option>
                         </select>
                     </div>
-                </form>                
+                </form>  
+                <br/>
+                <form id="form3">
+                    <div class="form-group" id="info-div">
+                        <label for="info-select">Informacion: </label>
+                        <select  id="info-select" class="form-control">
+                            <option selected value="1">Grupo 1</option>
+                            <option value="2">Grupo 2</option>
+                            <option value="3">Grupo 3</option>
+                            <option value="4">Grupo 4</option>
+                            <option value="5">Grupo 5</option>
+                        </select>
+                    </div>
+                </form>               
             </div>
             <div class="col-9 col-md-9">
                 <div id="chart-area"></div>    
             </div>
         </div>  
+        <div class="row" id="info-area">
+            <table class="table">
+                <thead>
+                    <tr>
+                      <th scope="col">Nombre</th>
+                      <th scope="col">Partido</th>
+                      <th scope="col">Provincia</th>
+                      <th scope="col">Region</th>
+                      <th scope="col">Voto</th>
+                    </tr>
+                  </thead>
+                  <tbody id = "here"> </tbody>
+            </table>
+        </div>
     </div>
     
 

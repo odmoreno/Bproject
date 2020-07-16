@@ -144,6 +144,15 @@ $("#map-select")
         update(sesiones[sesionid]);
     })
 
+$("#info-select")
+.on("change", function(){
+    //resetFlags()
+    //removeLegends()
+    //updateLegends()
+    update(sesiones[sesionid]);
+})
+
+
 $("#date-slider").ionRangeSlider({
     skin: "big",
     min: 0,
@@ -499,6 +508,9 @@ function update(data) {
     let mapeo = $("#map-select").val();
     console.log('mapeo select: ', mapeo)
 
+    let infoSelect = $("#info-select").val();
+    console.log('info select: ', infoSelect)
+
     console.log('sesion', data)
     let nodosSesion =  data.nodes // pasa los nodos de las sesion y sus votos
     let linksSesion =  data.links
@@ -548,6 +560,8 @@ function update(data) {
     newlinks = newlinks.map(d => Object.create(d));
     console.log('nodos asam', newnodes)
     console.log('links asam', newlinks)
+
+    showInfo(infoSelect, newnodes)
 
     for (let i=0; i<newnodes.length; i++){
         let d = newnodes[i]
@@ -705,3 +719,69 @@ function validateLinks(validNodes, linksSesion){
 
 
 
+function showInfo(option, nodos){
+    let newnodos;
+    if(option === "1"){
+        console.log("Opcion 1")
+        newnodos = nodos.filter(function (n) {
+            return n.voto === 0 
+        })
+    }
+    else if (option === "2"){
+        console.log("Opcion 2")
+        newnodos = nodos.filter(function (n) {
+            return n.voto === 1 
+        })
+    }
+    else if (option === "3"){
+        console.log("Opcion 3")
+        newnodos = nodos.filter(function (n) {
+            return n.voto === 2 
+        })
+    }
+    else if (option === "4"){
+        console.log("Opcion 2")
+        newnodos = nodos.filter(function (n) {
+            return n.voto === 3 
+        })
+    }
+    else if (option === "5"){
+        console.log("Opcion 2")
+        newnodos = nodos.filter(function (n) {
+            return n.voto === 4 
+        })
+    }
+
+    console.log("nodes filter", newnodos)
+    let table = d3.select("tbody")
+    console.log(table)
+
+    table.selectAll("tr").data(newnodos)
+    .join(
+        enter => enter.append("tr")
+        .append("th").attr("class", "scope").text(d => d.nombre)
+        .append("th").attr("class", "scope").text(d => codeVotes[d.voto])
+        ,
+        update => update.transition().duration(500),
+        exit => exit.remove().transition().duration(500)
+    );   
+    
+
+
+    //table.data(newnodos)
+    //    .selectAll("td")
+    //        .append("td").text( d => d.nombre)
+
+        //.join(
+        //    enter => 
+        //    enter.append("tr")
+        //        .append("th").attr("class", "scope").text(d => d.index)
+        //        .append("td").text( d => d.nombre)
+        //,
+        //update => update.transition().duration(500),
+        //exit => exit.remove().transition().duration(500)
+        //);
+
+
+
+}
