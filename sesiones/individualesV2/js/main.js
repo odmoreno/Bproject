@@ -13,7 +13,7 @@ var g = d3.select("#chart-area")
         //.attr("width", width + margin.left + margin.right)
         //.attr("height", height + margin.top + margin.bottom)
     .append("g")
-        .attr("transform", "translate(" + - margin.left + 
+        .attr("transform", "translate(" + (- margin.left +20) + 
             ", " + margin.top + ")");
 
 
@@ -82,12 +82,10 @@ let simulation2 = d3.forceSimulation(nodos)
     .force("y", d3.forceY())
     .on("tick", tick);
 
-    
-
 let nodes = g.append("g")
     .attr("fill", "#fff")
-    .attr("stroke", "#fff")//#000
-    .attr("stroke-width", 1.5)
+    //.attr("stroke", "#fff")//#000
+    //.attr("stroke-width", 1.5)
   .selectAll("circle")
 
 
@@ -122,7 +120,7 @@ let idg2 = d3.select("#g2")
 var tip = d3.tip().attr('class', 'd3-tip')
     .html(function(d) {
         let value = "Si"
-        if (modo == 1) d = d.data
+        //if (modo == 1) d = d.data
         if(d.suplente === false){
             value = "No"
         }
@@ -568,6 +566,7 @@ function getId (id){
 function update(data) {
 
     modo = 0
+    console.log("UPDATE!")
 
     // Standard transition time for the visualization
     let t = d3.transition()
@@ -592,7 +591,7 @@ function update(data) {
     let groupSelect = $("#select-grupos").val()
     if(groupSelect){
         groupMap = groupSelect
-        console.log('color select', groupMap)
+        console.log('Group select', groupMap)
     }
 
     console.log('sesion', data)
@@ -663,8 +662,8 @@ function update(data) {
             enter.append("circle").attr("r", 7)
                 .call( enter => enter.transition().attr("r", 7).attr("fill", function(d) { 
                     //console.log('color', color(d, mapeo))
-                    return color(d, colorMap) }).transition().duration(500) )
-                .call(drag(simulation2)),
+                    return color(d, colorMap) }).transition().duration(500) ),
+                //.call(drag(simulation2)),
           update => update.transition().duration(500).attr("fill", d => color(d, colorMap)),
           exit => exit.remove().transition().duration(500)
         );
@@ -689,48 +688,56 @@ function update(data) {
     else {
         console.log("grupo: ", groupMap)
         modo = 1 
-        let group = organizeData(newnodes, groupMap)
+        //let group = organizeData(newnodes, groupMap)
+        //console.log('Data group', group)
+        //
+        //const root = d3.hierarchy(group)
+        //const links = root.links();
+        //const nodos = root.descendants();
+//
+        //console.log("root", root)
+        //console.log("nodos", nodos)
+        //console.log("links", links)
+
+        let group = dataGroup(newnodes, groupMap)
+        //let group = Array.from(d3.group(newnodes, d=> d.region))
         console.log('Data group', group)
+
+        let linksGroup = generateLinks(group)
         
-        const root = d3.hierarchy(group)
-        const links = root.links();
-        const nodos = root.descendants();
-
-        console.log("root", root)
-        console.log("nodos", nodos)
-        console.log("links", links)
-
-        validNodes = [...nodos]
-        validLinks = [...links]
-        console.log("vNodes", validNodes)
-
-        simulation.restart()
+        validNodes = [...newnodes]
+        validLinks = [...linksGroup]
+        
+        console.log("valid N:", validNodes)
+        console.log("valid L:", validLinks)
 
         nodes = nodes
-         .data(validNodes, d=> {
-             if(d.depth ==2){
-                //console.log("id", d.data.id)
-                return d.data.id
-             }
+         .data(validNodes, d=> { return d.id
+             //if(d.depth ==2){
+             //   //console.log("id", d.data.id)
+             //   return d.data.id
+             //}
          })
          .join(
            enter => 
-             enter.append("circle").attr("r", 7).attr("stroke", d=> d.depth == 2 ? "#fff" : "#fff") //#000
+             enter.append("circle").attr("r", 7)//.attr("stroke", d=> d.depth == 2 ? "#fff" : "#fff") //#000
                  .call(enter => enter.transition().attr("r", 7).attr("fill", function(d) { 
-                    if (d.depth ==2) {
-                        //console.log('info', d.data)
-                        //console.log('color: ', color(d.data, colorMap))
-                        return color(d.data, colorMap)
-                    }
-                      }).transition().duration(500))
-                 .call(drag(simulation)),
-           update => update.transition().duration(500).attr("stroke", d=> d.depth == 2 ? "#fff" : "#fff")
+                     return color(d, colorMap)
+                    //if (d.depth ==2) {
+                    //    //console.log('info', d.data)
+                    //    //console.log('color: ', color(d.data, colorMap))
+                    //    return color(d.data, colorMap)
+                    //}
+                      }).transition().duration(500)),
+                 //.call(drag(simulation)),
+           update => update.transition().duration(500)//.attr("stroke", d=> d.depth == 2 ? "#fff" : "#fff")
                 .attr("fill", d => {
-                    if (d.depth ==2) {
-                        //console.log('info', d.data)
-                        //console.log('color: ', color(d.data, colorMap))
-                        return color(d.data, colorMap)
-                    }
+                    return color(d, colorMap)
+                    //if (d.depth ==2) {
+                    //    //console.log('info', d.data)
+                    //    //console.log('color: ', color(d.data, colorMap))
+                    //    return color(d.data, colorMap)
+                    //}
                  }),
            exit => exit.remove().transition().duration(500)
          );
@@ -743,21 +750,26 @@ function update(data) {
         //    .text(d => d.data.name);
 
         nodes
-            .style('opacity', d=> {
-                if(d.depth ==2){ 
-                    //console.log("opacidad", d.data.opacidad)
-                    return d.data.opacidad}
+            .style('opacity', d=> { return d.opacidad
+                //if(d.depth ==2){ 
+                //    //console.log("opacidad", d.data.opacidad)
+                //    return d.data.opacidad}
             })
 
-        simulation.nodes(validNodes, d=> {
-            if(d.depth ==2){ return d.data.id}
-        })
-        //simulation.force("link").links(validLinks);
-        simulation.force("charge", d3.forceManyBody().strength(-110))
-        //simulation.force("link").links(validLinks)
-        simulation.force("link", d3.forceLink(validLinks).distance(-10).strength(0.6))
-        simulation.alpha(0.5)
+        //simulation.nodes(validNodes, d=> {
+        //    if(d.depth ==2){ return d.data.id}
+        //})
+        ////simulation.force("link").links(validLinks);
+        //simulation.force("charge", d3.forceManyBody().strength(-110))
+        ////simulation.force("link").links(validLinks)
+        //simulation.force("link", d3.forceLink(validLinks).distance(-10).strength(0.6))
+        //simulation.alpha(0.5)
         
+        simulation.nodes(validNodes, d=> d.id)  
+        simulation.force("charge", d3.forceManyBody().strength(-60))
+        simulation.force("link", d3.forceLink(validLinks).distance(-1).strength(0.4))
+        simulation.alpha(0.3).restart();
+
     }
 
     $("#sesion")[0].innerHTML = data.sesion
@@ -1141,7 +1153,7 @@ function getIdBtn2(id2){
 }
 
 drag = simulation => {
-
+     
   function dragstarted(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
@@ -1164,6 +1176,40 @@ drag = simulation => {
       .on("drag", dragged)
       .on("end", dragended);
 }
+
+generateLinks = (group) => {
+
+    let links = []
+    let nodoPadre;
+    const size = group.length
+    for (let i=0; i<size; i++){
+        let nodosG = group[i][1]
+        nodoPadre = nodosG[0]
+        for (let j=1; j<nodosG.length; j++){
+            let enlace = {
+                "source" : nodoPadre,
+                "target" : nodosG[j],
+                //"id": counter
+            }
+            links.push(enlace)
+        }
+    }
+    return links
+}
+
+dataGroup = (newnodes, groupMap) => {
+    let group;
+    if (groupMap == 'region')
+        group = Array.from(d3.group(newnodes, d=> d.region))
+    else if (groupMap == 'partido')
+        group = Array.from(d3.group(newnodes, d=> d.partido))
+    else if (groupMap == 'provincia')
+        group = Array.from(d3.group(newnodes, d=> d.provincia))
+
+    return group;
+}
+
+
 
 organizeData = (data, option) => {
   

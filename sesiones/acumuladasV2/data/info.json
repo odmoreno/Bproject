@@ -1,0 +1,49 @@
+{
+  "partidos": {
+    "": 0,
+    "alianza pais": 1,
+    "creo": 2,
+    "independiente": 3,
+    "izquierda democrática": 4,
+    "movimientos provinciales": 5,
+    "otro movimiento": 6,
+    "pachakutik": 7,
+    "partido social cristiano": 8,
+    "sociedad patriótica": 9,
+    "suma": 10
+  },
+  "regiones": {
+    "costa": 0,
+    "sierra": 1,
+    "oriente": 2,
+    "insular": 3,
+    "otros": 4
+  },
+  "provincias": {
+    "esmeraldas": 0,
+    "manabí": 1,
+    "guayas": 2,
+    "santa elena": 3,
+    "los ríos": 4,
+    "el oro": 5,
+    "santo domingo de los tsáchilas": 6,
+    "carchi": 7,
+    "imbabura": 8,
+    "pichincha": 9,
+    "cotopaxi": 10,
+    "tungurahua": 11,
+    "chimborazo": 12,
+    "bolívar": 13,
+    "cañar": 14,
+    "azuay": 15,
+    "loja": 16,
+    "sucumbíos": 17,
+    "napo": 18,
+    "orellana": 19,
+    "pastaza": 20,
+    "morona santiago": 21,
+    "zamora chinchipe": 22,
+    "galápagos": 23,
+    "otros": 24
+  }
+}

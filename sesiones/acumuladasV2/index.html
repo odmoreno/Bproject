@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>Grafo de sesiones Individuales</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    -->
+    <!-- jQuery UI CSS -->
+    <link rel="stylesheet" href="css/jquery-ui.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
+    <!-- D3 Tooltip CSS -->
+    <link rel="stylesheet" href="css/d3-tip.css">
+    <!-- Ion range slider -->
+    <link rel="stylesheet" href="css/ion.rangeSlider.min.css">
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+     <!-- datepicker 
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">-->
+    <link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+    <!-- multiselect CSS -->
+    <link rel="stylesheet" href="css/bootstrap-multiselect.css">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid col-sm-12">
+            <a class="navbar-brand" href="#"><img id="logo" src="img/logo.png"></a>      
+        </div>
+    </nav>
+
+    <!-- Bootstrap grid setup -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="slider-div">
+                    <label>Sesion: <span id="sesion">0</span> </label>
+                    <label>Votacion: <span id="votacion">0</span></label>
+                    <div id="date-slider"></div>
+                    <br/>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6 m-auto">
+                        <!--<h3 class="text-left p-3">Buscar : </h3> 
+                <div class="form-group d-flex flex-row">
+                    <i class="fas fa-search p-2"></i>
+                    <input type="text" id="search" class="form-control form-control-sm p-2" placeholder="Buscar asunto o sesion ..."/>
+                </div>-->
+                        <div class="input-group date p-5" id ="datepicker">
+                            <input type="text" class="form-control" id="dateP">
+                            
+                            <div class="input-group-addon">
+                                <span class="input-group-addon"><i class="far fa-calendar-alt p-2"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="row" style="position: relative;">
+                    <div class="list-group col-md-10 m-auto" id="match2-list" style="position: absolute;"></div>
+                </div>-->
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group d-flex flex-row p-1">
+                    <input type="text" id="search" class="form-control form-control-sm p-2" placeholder="Buscar asunto o sesion ..."/>
+                    <i class="fas fa-search p-2"></i>
+                </div>
+            </div>
+            <div class="col-md-8" style="position: relative;">
+                <div class="list-group col-md-8 m-auto" id="fecha-list" style="position: absolute;"></div>
+            </div>
+        </div>
+        <!--<div class="row">
+            <div class="d-flex flex-row justify-content-center">
+                <div class="input-group date p-5" id ="datepicker">
+                    <input type="text" class="form-control"><span class="input-group-addon"><i class="far fa-calendar-alt p-2"></i></span>
+                </div>
+                <div class="row" style="position: relative;">
+                    <div class="list-group col-md-10 m-auto" id="fecha-list" style="position: absolute;"></div>
+                </div>
+            </div>
+        </div>-->
+        <div class="row" id="info">
+            <div class="d-flex flex-column justify-content-center" id="content-div">
+                <div class="p-1" id="asunto-div">
+                    <label class="text-center"> <span id="asunto"></span></label>
+                </div>
+                <!--<div class="p-2" id="fecha-div">
+                    <label class="text-secondary"> <span id="fecha"> </span> </label>
+                </div>-->
+            </div>
+        </div>
+        <!--
+            <div class="row p-3">
+            <div class="col-6 col-md-3">
+                <label for="example-select">Example: </label>
+                <select id="example-select" multiple="multiple">
+                    <option value="0">Cheese</option>
+                    <option value="1">Tomatoes</option>
+                    <option value="2">Mozzarella</option>
+                    <option value="3">Mushrooms</option>
+                    <option value="4">Pepperoni</option>
+                    <option value="onions">Onions</option>
+                </select>
+            </div>
+            <div class="col-2 col-md-2">
+                <button type="button" id="example-button" class="btn btn-outline-primary">+</button>
+            </div>
+        </div>
+        -->
+        <!--
+            <div class="d-flex flex-row" id="filters-div">        
+            <div class="p-2">
+                <form>
+                    <div class="form-group">
+                        <label for="filter-select">Filtrar: </label>
+                        <select id="filter-select" class="form-control">
+                            <option selected>Menu</option>
+                            <option value="0">Partidos</option>
+                            <option value="1">Regiones</option>
+                            <option value="2">Provincias</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="p-2" id="btn-add">
+                <button type="button" id="add-filter" class="btn btn-outline-primary ">+</button>
+            </div>
+        </div>
+        <div class="d-flex flex-column p-2" id="show-filters">
+            <form id="form-filters">
+                
+            </form>
+        </div>
+        -->
+        <div class="row">
+            <div class="col-3 col-md-3">
+                <div class="d-flex flex-row" id="filters-div">        
+                    <div class="p-1">
+                        <form>
+                            <div class="form-group">
+                                <label for="filter-select">Filtros: </label>
+                                <select id="filter-select" class="form-control">
+                                    <option value="menu" selected> </option>
+                                    <option value="0">Partidos</option>
+                                    <option value="1">Regiones</option>
+                                    <option value="2">Provincias</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="p-1" id="btn-add">
+                        <button type="button" id="add-filter" class="btn btn-outline-primary ">+</button>
+                    </div>
+                </div>
+                <div class="d-flex flex-column p-2" id="show-filters">
+                </div>   
+                <br>
+                <br>
+                <div class="d-flex flex-row" id="mapeo-div">        
+                    <div class="p-1">
+                        <form>
+                            <div class="form-group">
+                                <label for="mapeo-select">Mapeo: </label>
+                                <select id="mapeo-select" class="form-control">
+                                    <option value="menu" selected> </option>
+                                    <option value="0">Colores</option>
+                                    <option value="1">Grupos</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="p-1" id="btn-add-map">
+                        <button type="button" id="add-map" class="btn btn-outline-primary ">+</button>
+                    </div>
+                </div>
+                <div class="d-flex flex-column p-2" id="show-maps">
+                </div>           
+            </div>
+            <div class="col-9 col-md-9">
+                <div id="chart-area"></div>    
+            </div>
+        </div>  
+        <div class="row">
+            <div id="cluster-area" class="col-10 col-md-10"></div>
+        </div>
+    </div>
+    
+
+<!-- External JS libraries 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+-->
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/d3.min.js"></script>
+<script src="js/d3-array.min.js"></script>
+<script src="js/d3-tip.js"></script>
+<script src="js/ion.rangeSlider.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>-->
+<script src="js/bootstrap-datepicker.min.js"></script>
+<!-- multiselect js -->
+<script src="js/bootstrap-multiselect.js"></script>
+<!-- Custom JS -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
