@@ -13,9 +13,13 @@ var g = d3.select("#chart-area")
         //.attr("width", width + margin.left + margin.right)
         //.attr("height", height + margin.top + margin.bottom)
     .append("g")
+        .attr('id', 'g1')
         .attr("transform", "translate(" + (- margin.left +20) + 
             ", " + margin.top + ")");
 
+
+var w2 = width
+var h2 = height
 
 //datos sesion
 let nodos = []
@@ -61,7 +65,7 @@ let modo = 0
 
 //Elementos del buscador
 const searchBar = document.getElementById('search');
-const matchList = document.getElementById('match-list');
+//const matchList = document.getElementById('match-list');
 const fechaList = document.getElementById('fecha-list');
 
 let simulation = d3.forceSimulation(nodos)
@@ -88,7 +92,7 @@ let nodes = g.append("g")
     //.attr("stroke-width", 1.5)
   .selectAll("circle")
 
-
+let labels = g.selectAll("text")
 
 const promises = [
     d3.json("data/info.json"),
@@ -124,12 +128,12 @@ var tip = d3.tip().attr('class', 'd3-tip')
         if(d.suplente === false){
             value = "No"
         }
-        var text = "<strong>Nombre:</strong> <span style='color:red'>" + d.nombre + "</span><br>";
-        text += "<strong>Partido:</strong> <span style='color:red;text-transform:capitalize'>" + d.partido + "</span><br>";
-        text += "<strong>Provincia:</strong> <span style='color:red;text-transform:capitalize'>" + d.provincia + "</span><br>";
-        text += "<strong>Region:</strong> <span style='color:red;text-transform:capitalize'>" + d.region + "</span><br>";
-        text += "<strong>Voto:</strong> <span style='color:red;text-transform:capitalize'>" + codeVotes[d.voto]  + "</span><br>";
-        text += "<strong>Suplente:</strong> <span style='color:red;text-transform:capitalize'>" + value  + "</span><br>";
+        var text = "<strong>Nombre:</strong> <span style='color:aqua'>" + d.nombre + "</span><br>";
+        text += "<strong>Partido:</strong> <span style='color:aqua;text-transform:capitalize'>" + d.partido + "</span><br>";
+        text += "<strong>Provincia:</strong> <span style='color:aqua;text-transform:capitalize'>" + d.provincia + "</span><br>";
+        text += "<strong>Region:</strong> <span style='color:aqua;text-transform:capitalize'>" + d.region + "</span><br>";
+        text += "<strong>Voto:</strong> <span style='color:aqua;text-transform:capitalize'>" + codeVotes[d.voto]  + "</span><br>";
+        text += "<strong>Suplente:</strong> <span style='color:aqua;text-transform:capitalize'>" + value  + "</span><br>";
         return text;
     });
 g.call(tip);
@@ -197,23 +201,56 @@ $("#date-slider").ionRangeSlider({
     }
 });
 
+var leave = 1
 $("#search")
-    .on("input", function() {
-        console.log('hello search', this.value)
-        resetFlags()
-        searchSesiones(this.value)
-    })
-    .on("click", function(){
-        console.log('hello click', this.value)
-        resetFlags()
-        searchSesiones(this.value)
-    })
-    
-$("#match-list")
-    .on("focusout", function(){
-        console.log('Afuera')
-        //matchList.innerHTML = '';
-    })
+.on("input", function() {
+    console.log('hello search', this.value)
+    resetFlags()
+    searchSesiones(this.value)
+})
+.on("click", function(){
+    console.log('hello click', this.value)
+    resetFlags()
+    searchSesiones(this.value)
+})
+.on("focusout", function(){
+    console.log('Focus out')
+    if(leave == 1 ){
+        console.log('salir')
+        fechaList.innerHTML = '';
+    } 
+    leave = 1 
+})
+
+var list = $("#search")
+$(document).keyup(function(e) {
+    if (e.key === "Escape") { // escape key maps to keycode `27`
+       console.log('esc')
+       fechaList.innerHTML = '';  
+   }
+   //if ($("#search").is(":focus")) {
+   // //I have the focus
+   //     console.log('focus serach ')
+   // }
+
+
+});
+
+$("#fecha-list")
+.on("mouseenter", function(){
+    console.log('enter')
+    leave = 0
+    //fechaList.innerHTML = '';
+})
+.on("mouseleave", function(){
+    console.log('leave')
+    leave = 1
+    //fechaList.innerHTML = '';
+})
+
+//$("#fecha-list").on('mouseover', function(){
+//    console.log('onmouseover')
+//})
 
 $("#datepicker").datepicker( {
     format: "dd-mm-yyyy",
@@ -238,7 +275,17 @@ $("#datepicker").datepicker( {
 });
 
 $('#btn-add').click(addFilter)
-$('#btn-add-map').click(addFilter2)
+//$('#btn-add-map').click(addFilter2)
+
+$('#grupos-select').multiselect({
+    buttonWidth: '120px',
+    onChange : onChangeSelect2
+});
+
+$('#colores-select').multiselect({
+    buttonWidth: '120px',
+    onChange : onChangeSelect2
+});
 
 
 Promise.all(promises).then(allData => {
@@ -280,7 +327,7 @@ function manageData(){
     
     mapDict = {
         "0": { "id": 'select-colores', "values": ["partidos", "region", "provincia", "voto"], "name": "Colores", "flag": false, "id2": "div-colores", "idstr": "0"},
-        "1": { "id": 'select-grupos', "values": ["partido", "region", "provincia", "voto"], "name": "Grupos", "flag": false, "id2": "div-grupos", "idstr": "1"}
+        "1": { "id": 'select-grupos', "values": ["curul", "partido", "region", "provincia", "voto"], "name": "Posición", "flag": false, "id2": "div-grupos", "idstr": "1"}
     }
 
     sesionid = 0
@@ -334,7 +381,7 @@ function updateLegends() {
     const defaultVal = "voto";
     option = defaultVal
     
-    let colorSelect = $("#select-colores").val()
+    let colorSelect = $("#colores-select").val()
     if(colorSelect){
         option = colorSelect
         console.log('Legend select', option)
@@ -356,7 +403,7 @@ function updateLegends() {
         list.forEach(function(element, i){
             let valueid = partidos[element]
             var legendRow = legend.append("g")
-            .attr("transform", "translate(0, " + (i * 20) + ")");
+            .attr("transform", "translate(-45, " + (i * 20) + ")");
         
             legendRow.append("rect")
                 .attr("width", 10)
@@ -565,17 +612,32 @@ function getId (id){
 
 function update(data) {
 
+    d3.select("#g1")
+        .attr("transform", "translate(" + (- margin.left +20) + 
+            ", " + margin.top + ")");
+
     modo = 0
     console.log("UPDATE!")
 
     // Standard transition time for the visualization
     let t = d3.transition()
-        .duration(100);
+        .duration(500);
+
+    let g1 = d3.select("#g1")
+    //console.log('g1', g1)
+    g1.style("visibility", "visible")
+
+    let pleno = d3.select("#pleno")
+    let pleno2 = d3.select("#pleno2")
+    if(pleno){
+        pleno.remove()
+        pleno2.remove()
+    }
 
     const defaultMap = "voto"
     let colorMap = defaultMap
 
-    let colorSelect = $("#select-colores").val()
+    let colorSelect = $("#colores-select").val()
     
     if(colorSelect){
         colorMap = colorSelect
@@ -588,7 +650,7 @@ function update(data) {
     const defaultGroup = "voto"
     let groupMap = defaultGroup
 
-    let groupSelect = $("#select-grupos").val()
+    let groupSelect = $("#grupos-select").val()
     if(groupSelect){
         groupMap = groupSelect
         console.log('Group select', groupMap)
@@ -667,14 +729,18 @@ function update(data) {
           update => update.transition().duration(500).attr("fill", d => color(d, colorMap)),
           exit => exit.remove().transition().duration(500)
         );
-        //nodes.append("title")
-        //  .text(d => d.nombre);
+        //nodes.append("text")
+        //    .attr("x", d=> d.x )
+        //    .attr("y", d=> d.y)     
+        //    .text(d => codeVotes[d.voto])
+        //    
+                    
         nodes
             .on("mouseover", tip.show)
             .on("mouseout", tip.hide)
         nodes
             .style('opacity', d=> d.opacidad)
-
+ 
         simulation2.nodes(validNodes, d=> d.id)
         simulation2.force("charge", d3.forceManyBody().strength(-50))
         simulation2.force("link").links(validLinks)
@@ -684,9 +750,70 @@ function update(data) {
         //}).distance(-10).strength(-10))
         simulation2.alpha(0.5).restart();
 
+        drawClusters(validNodes, groupMap)
+        //simulation2.alpha(0.5).restart();
+
     }
+    else if (groupMap == "curul"){
+        console.log('Por curul')
+
+        t
+
+        g1.style("visibility", "hidden")
+        let curulesPorFila = [[2, 4], [3, 5], [4, 6], [5, 7], [6, 9], [8, 10]];
+    
+        var xyfactor = w2 / 40.0;
+
+        console.log('factor', xyfactor)
+    
+        var acx = (690-w2) / 8.4
+        var cx = w2 / 2 + acx;// - 20;
+        var cy = h2 / 4 - 20;
+        var tcx = (800-w2)*0.28;
+        var tcy = -(690-w2)/23.0;
+
+        let nodos = nodosPrincipales(xyfactor, colorMap)
+        //let pleno = d3.select("svg")
+        
+        d3.select("#pleno").remove()
+        d3.select("#pleno2").remove()
+
+        let sup = d3.select("svg").append('g').attr("id", "pleno")
+            .attr("transform", "translate(" + (-400) + 
+                ", " + (-200) + ")");
+
+        sup.selectAll('circle').data(nodos)
+            .enter()
+            .append('circle')
+            .attr("r", d=> d.r).attr('cx', d=> d.cx).attr('cy', d=>d.cy).attr('fill', d=> color(d, colorMap))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
+
+        let test =  getNodosEdit(newnodes, curulesPorFila, cx, cy, tcx, tcy, xyfactor)
+        console.log('edit', test)
+    
+        let inf = d3.select("svg").append('g').attr("id", "pleno2")
+            .attr("transform", "translate(" + (-400) + 
+                ", " + (-200) + ")");
+
+        inf.selectAll('circles').data(test, d=> d.id)
+            .join(
+                enter => 
+                    enter.append('circle')
+                        .call(enter => enter.attr("r", d=> d.r).attr('cx', d=> d.cx).attr('cy', d=> d.cy).attr('fill', d=> color(d, colorMap))
+                        .style('opacity', d=> d.opacidad)
+                        .on("mouseover", tip.show).on("mouseout", tip.hide) ),
+                update => update.transition().duration(500),
+                exit => exit.remove().transition().duration(500)
+            );
+        
+    } 
     else {
         console.log("grupo: ", groupMap)
+
+        d3.select("#g1")
+            .attr("transform", "translate(" + (- margin.left + 50) + 
+                ", " + margin.top + ")");
         modo = 1 
         //let group = organizeData(newnodes, groupMap)
         //console.log('Data group', group)
@@ -769,7 +896,7 @@ function update(data) {
         simulation.force("charge", d3.forceManyBody().strength(-60))
         simulation.force("link", d3.forceLink(validLinks).distance(-1).strength(0.4))
         simulation.alpha(0.3).restart();
-
+        drawClusters(validNodes, groupMap)
     }
 
     $("#sesion")[0].innerHTML = data.sesion
@@ -780,11 +907,89 @@ function update(data) {
     document.getElementById('dateP').value = fecha
 }
 
+function drawClusters (nodos, mapOption) {
+    let group = {"0": '', "1":'', "2":'', "3":'', "4":'', "5": '', "6":'', "7":'', "8":'', "9":'', "10": '', "11":'', "12":'', "13":'', "14":'', 
+    "15":'', "16": '', "17":'', "18":'', "19":'', "20":'', "21":'', "22":'', "23":'', "24":'', "25":''}
+    //if (mapOption == 'voto'){
+    //    console.log('1')
+    //    group = {"0": '', "1":'', "2":'', "3":'', "4":''}
+    //}
+    //else if (mapOption == 'region'){
+    //    console.log('2')
+    //    group = {"0": '', "1":'', "2":'', "3":'', "4":''}
+    //}
+    //console.log('group cluster:', nodos[0])
+    for (let l=0; l<nodos.length; l++){
+        let n = nodos[l]
+        if (n.x){
+            //if(group[n.voto]){}
+            //else group[n.voto] = n
+            if (mapOption == 'voto'){
+                group[n.voto] = n
+            }
+            else if(mapOption == 'region'){
+                group[regiones[n.region]] = n
+            }
+            else if(mapOption == 'partido'){
+                group[partidos[n.partido]] = n
+            }
+            else if(mapOption == 'provincia'){
+                group[provincias[n.provincia]] = n
+            }
+        }
+    }
+    console.log('final: ', group)
+    let data = Object.values(group)
+    data = data.filter(n=> {
+        if(n){
+            return n
+        }
+    })
+    labels = labels
+        .data(data, d => d.id)
+        .join(
+          enter => 
+            enter.append("text")
+                .attr("x", d=> (d.x))
+                .attr("y", d=> d.y)
+                .text(d => optionMap(mapOption,d))
+                //.attr("font-size", 10)
+                .attr("font-family", "sans-serif")
+                .attr("text-anchor", "middle")
+                .attr("font-size", "1rem"),
+                //.call( enter => enter.transition().attr("r", 7).attr("fill", function(d) { 
+                //    //console.log('color', color(d, mapeo))
+                //    return color(d, colorMap) }).transition().duration(500) ),
+                //.call(drag(simulation2)),
+          update => update.transition().duration(500).text(d => optionMap(mapOption,d)),
+          exit => exit.remove().transition().duration(500)
+        );
+}
+
+optionMap = (option,d) => {
+    if (option == 'voto'){
+        return codeVotes[d.voto]
+    }
+    else if(option == 'region'){
+        return d.region
+        //group[regiones[n.region]] = n
+    }
+    else if(option == 'partido'){
+        return d.partido
+        //group[regiones[n.region]] = n
+    } else if(option == 'provincia'){
+        return d.provincia
+    }
+}
+
 function tick() {
     nodes.attr("cx", d => d.x)
-        .attr("cy", d => d.y);
-} 
+        .attr("cy", d => d.y)
 
+    g.selectAll("text")
+        .attr("x", d=> d.x )
+        .attr("y", d=> d.y + 30)
+} 
 
 // para rangos cortos
 function colorGroup(d){
@@ -807,7 +1012,11 @@ function color(d, option){
     }
     else if ( option == "provincia") {
         //let valueId = provincias[d.provincia.trim()]
-        let valueId = provincias[d.provincia]
+        let valueid
+        if (provincias[d.provincia]) {
+            valueId = provincias[d.provincia]    
+        }
+        else valueId = 24
         return colorProvincias(valueId)
     }
     else if (option == "voto") {
@@ -1060,6 +1269,7 @@ function filterFunction(nodos){
     return nodos
 }
 
+/*
 // function para mapeos din
 function addFilter2() { 
     let option = $("#mapeo-select").val();  
@@ -1127,17 +1337,6 @@ function iniciarSelect2(idSel){
         onChange : onChangeSelect2
       });
 }   
-function onChangeSelect2(element, checked){
-    //console.log('id select: ', element[0].parentElement.id)
-    //console.log('Current value:', element.val())
-    let stringid = '#' + element[0].parentElement.id + ' option:selected'
-    let values = $(stringid).map(function(a, item){return item.value;});
-    console.log(values)
-    removeLegends()
-    updateLegends()
-    //resetOpacity()
-    update(sesiones[sesionid]);
-}
 
 function getIdBtn2(id2){
     console.log("Function onclick", id2)
@@ -1150,6 +1349,18 @@ function getIdBtn2(id2){
     resetOpacity()
     update(sesiones[sesionid]);
   
+}*/
+
+function onChangeSelect2(element, checked){
+    //console.log('id select: ', element[0].parentElement.id)
+    //console.log('Current value:', element.val())
+    let stringid = '#' + element[0].parentElement.id + ' option:selected'
+    let values = $(stringid).map(function(a, item){return item.value;});
+    console.log(values)
+    removeLegends()
+    updateLegends()
+    //resetOpacity()
+    update(sesiones[sesionid]);
 }
 
 drag = simulation => {
@@ -1210,7 +1421,108 @@ dataGroup = (newnodes, groupMap) => {
 }
 
 
+function nodosPrincipales(factor, map){
+    
+    let pres = w2/2 -25
+    let ids = [153, 237, 106, 209, 55, 53, 158]
+    const cy = [50, 50, 50, 120, 120, 120, 120]
+    const cx = [pres, pres -40, pres+40, pres+40, pres+75, pres-65, pres-30]
+    const r = [factor -2, factor -2, factor -2, factor -7, factor -7, factor -7, factor -7]
 
+    let nodos = []
+    for (let n=0; n<ids.length; n++){
+        let data = asambleistas[ids[n]]
+        data.cx = cx[n]
+        data.cy = cy[n]
+        data.r = r[n]
+        nodos.push(data)
+    }
+    console.log('final: ', nodos)
+
+    return nodos
+}
+
+function getNodosEdit (newnodes, curulesPorFila, cx, cy, tcx, tcy, xyfactor){
+    
+    let group = Array.from(d3.group(newnodes, d=> d.partido))
+    console.log('Data group', group)
+    let test = []
+    group.map( grupo => {
+        test = [ ... test, ... grupo[1]]
+    })
+    console.log('grops', test)
+    var contadorGeneral = 0;
+    for (var i = 0; i < curulesPorFila.length; i++) {
+        var radio = 150 + (27*xyfactor/20) * i;
+        var bloques = curulesPorFila[i];
+        var deltaAngulo = (25*xyfactor/20) / radio;
+        var angulo = Math.PI / 4 - ((10*xyfactor/20) * Math.PI / 180) - bloques[0] * deltaAngulo;
+        for (var k = 0; k < bloques[0] && contadorGeneral < test.length; k++) {
+            var px = cx + radio * -1 * Math.cos(angulo);
+            var py = cy + radio * Math.sin(angulo);
+            //console.log('counter:', contadorGeneral)
+            test[contadorGeneral].cx = px
+            test[contadorGeneral].cy = py
+            test[contadorGeneral].r = xyfactor -9
+            angulo += deltaAngulo;
+            contadorGeneral++;
+        }
+
+        angulo += deltaAngulo;
+        for (k = 0; k < bloques[1] && contadorGeneral < test.length; k++) {
+            px = cx + radio * -1 * Math.cos(angulo);
+            py = cy + radio * Math.sin(angulo);
+            
+            test[contadorGeneral].cx = px
+            test[contadorGeneral].cy = py
+            test[contadorGeneral].r = xyfactor -9
+
+            angulo += deltaAngulo;
+            contadorGeneral++;
+        }
+    }
+
+    // Segundo grupo de dos bloques.
+    var deltaMax3 = 25 / (150 + (27*xyfactor/20) * (curulesPorFila.length - 1));
+    var anguloMax = angulo + deltaMax3 * (curulesPorFila[curulesPorFila.length - 1][1] + 1);
+
+    for (i = 0; i < curulesPorFila.length; i++) {
+
+        var radio = 150 + (27*xyfactor/20) * i;
+        var bloques = curulesPorFila[i];
+        var deltaAngulo = (25*xyfactor/20) / radio;
+        var angulo = anguloMax - deltaAngulo * bloques[1];
+
+        for (k = 0; k < bloques[1] && contadorGeneral < test.length; k++) {
+            var px = cx - tcx + radio * -1 * Math.cos(angulo);
+            var py = cy - tcy + radio * Math.sin(angulo);
+            
+            test[contadorGeneral].cx = px
+            test[contadorGeneral].cy = py
+            test[contadorGeneral].r = xyfactor -9
+            
+            angulo += deltaAngulo;
+            contadorGeneral++;
+        }
+
+        angulo += deltaAngulo;
+        for (k = 0; k < bloques[0] && contadorGeneral < test.length; k++) {
+            var px = cx - tcx + radio * -1 * Math.cos(angulo);
+            var py = cy - tcy + radio * Math.sin(angulo);
+
+            test[contadorGeneral].cx = px
+            test[contadorGeneral].cy = py
+            test[contadorGeneral].r = xyfactor -9
+
+            angulo += deltaAngulo;
+            contadorGeneral++;
+        }
+    }
+    return test
+}
+
+
+/*
 organizeData = (data, option) => {
   
     let bucket;
@@ -1282,3 +1594,29 @@ bucketOption = (option, value) => {
     return bucket
 }
 
+*/
+/*
+    //g.selectAll("text").remove()
+    //let labels = g.selectAll("g")
+    
+    //labels = labels
+    //    .data(data, d=> d)
+    //    .enter()
+    //    //.append("g")
+    //    //.attr("transform", d => { 
+    //    //    console.log(d)
+    //    //    //return `translate(${(d.x)-30},${(d.y + d.r)-70})`
+    //    //    return `translate(${(d.x)},${(d.y)})`
+    //    //})
+    //    .append("text")
+    //        .attr("x", d=> (d.x))
+    //        .attr("y", d=> d.y)
+    //        .text(d => codeVotes[d.voto])
+    //        .attr("font-size", 15)
+    //        .attr("font-family", "sans-serif")
+    //        .attr("text-anchor", "middle")
+    //        .attr("font-size", "1rem")
+    //        //.style("position", "relative")
+    //        //style="position: relative;"
+    //        //.attr("text-align", "right")
+    //        //text-align: right;*/ 

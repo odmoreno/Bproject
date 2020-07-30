@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" id="search-div">
             <div class="col-md-4">
                 <div class="form-group d-flex flex-row p-1">
                     <input type="text" id="search" class="form-control form-control-sm p-2" placeholder="Buscar asunto o sesion ..."/>
@@ -168,23 +168,49 @@
                 <br>
                 <br>
                 <div class="d-flex flex-row" id="mapeo-div">        
-                    <div class="p-1">
+                    <span>Mapeo: </span>
+                    <br>
+                    <br>
+                    <!--<div class="p-1">
                         <form>
                             <div class="form-group">
                                 <label for="mapeo-select">Mapeo: </label>
                                 <select id="mapeo-select" class="form-control">
                                     <option value="menu" selected> </option>
                                     <option value="0">Colores</option>
-                                    <option value="1">Grupos</option>
+                                    <option value="1">Posición</option>
                                 </select>
                             </div>
                         </form>
                     </div>
                     <div class="p-1" id="btn-add-map">
                         <button type="button" id="add-map" class="btn btn-outline-primary ">+</button>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="d-flex flex-column p-2" id="show-maps">
+                    <div class="d-flex flex-row">
+                        <div class="p-2 d-flex flex-column">
+                            <label for="grupos-select">Posición: </label>
+                            <select id="grupos-select" class="form-control">
+                                <option value="curul" selected>Curul </option>
+                                <option value="partido">partido</option>
+                                <option value="region">region</option>
+                                <option value="provincia">provincia</option>
+                                <option value="voto">voto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="p-2 d-flex flex-column">
+                            <label for="colores-select">Colores: </label>
+                            <select id="colores-select" class="form-control">
+                                <option value="partidos" selected>Partido</option>
+                                <option value="region">Region</option>
+                                <option value="provincia">Provincia</option>
+                                <option value="voto">Voto</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>           
             </div>
             <div class="col-9 col-md-9">
